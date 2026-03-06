@@ -1,0 +1,274 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    html, body {
+      width: 100vw;
+      height: 100vh;
+      background: transparent;
+      overflow: hidden;
+      pointer-events: none;
+    }
+
+    .border-frame {
+      position: fixed;
+      inset: 0;
+      border: 3px solid transparent;
+      border-radius: 0;
+      opacity: 0;
+      transition: opacity 0.4s ease;
+      pointer-events: none;
+    }
+
+    /* The four border sides as separate elements for glow effect */
+    .border-top,
+    .border-bottom,
+    .border-left,
+    .border-right {
+      position: fixed;
+      background: linear-gradient(90deg, 
+        transparent 0%, 
+        #00aaff 20%, 
+        #0066ff 50%, 
+        #00aaff 80%, 
+        transparent 100%
+      );
+      opacity: 0;
+      transition: opacity 0.5s ease;
+      pointer-events: none;
+    }
+
+    .border-top, .border-bottom {
+      left: 0; right: 0;
+      height: 3px;
+    }
+
+    .border-left, .border-right {
+      top: 0; bottom: 0;
+      width: 3px;
+      background: linear-gradient(180deg,
+        transparent 0%,
+        #00aaff 20%,
+        #0066ff 50%,
+        #00aaff 80%,
+        transparent 100%
+      );
+    }
+
+    .border-top { top: 0; }
+    .border-bottom { bottom: 0; }
+    .border-left { left: 0; }
+    .border-right { right: 0; }
+
+    /* Glow layers */
+    .glow-top, .glow-bottom, .glow-left, .glow-right {
+      position: fixed;
+      opacity: 0;
+      transition: opacity 0.5s ease;
+      pointer-events: none;
+    }
+
+    .glow-top, .glow-bottom {
+      left: 0; right: 0;
+      height: 20px;
+    }
+
+    .glow-left, .glow-right {
+      top: 0; bottom: 0;
+      width: 20px;
+    }
+
+    .glow-top {
+      top: 0;
+      background: linear-gradient(180deg, rgba(0,150,255,0.4) 0%, transparent 100%);
+    }
+
+    .glow-bottom {
+      bottom: 0;
+      background: linear-gradient(0deg, rgba(0,150,255,0.4) 0%, transparent 100%);
+    }
+
+    .glow-left {
+      left: 0;
+      background: linear-gradient(90deg, rgba(0,150,255,0.4) 0%, transparent 100%);
+    }
+
+    .glow-right {
+      right: 0;
+      background: linear-gradient(270deg, rgba(0,150,255,0.4) 0%, transparent 100%);
+    }
+
+    /* Corner accents */
+    .corner {
+      position: fixed;
+      width: 24px;
+      height: 24px;
+      opacity: 0;
+      transition: opacity 0.5s ease;
+      pointer-events: none;
+    }
+
+    .corner-tl { top: 0; left: 0; border-top: 3px solid #00ccff; border-left: 3px solid #00ccff; }
+    .corner-tr { top: 0; right: 0; border-top: 3px solid #00ccff; border-right: 3px solid #00ccff; }
+    .corner-bl { bottom: 0; left: 0; border-bottom: 3px solid #00ccff; border-left: 3px solid #00ccff; }
+    .corner-br { bottom: 0; right: 0; border-bottom: 3px solid #00ccff; border-right: 3px solid #00ccff; }
+
+    /* Active state */
+    body.active .border-top,
+    body.active .border-bottom,
+    body.active .border-left,
+    body.active .border-right {
+      opacity: 1;
+      animation: borderPulse 3s ease-in-out infinite;
+    }
+
+    body.active .glow-top,
+    body.active .glow-bottom,
+    body.active .glow-left,
+    body.active .glow-right {
+      opacity: 1;
+      animation: glowPulse 3s ease-in-out infinite;
+    }
+
+    body.active .corner {
+      opacity: 1;
+      animation: cornerPulse 3s ease-in-out infinite;
+    }
+
+    /* Listening state - brighter pulse */
+    body.listening .border-top,
+    body.listening .border-bottom,
+    body.listening .border-left,
+    body.listening .border-right {
+      opacity: 1;
+      animation: listenPulse 1s ease-in-out infinite;
+    }
+
+    body.listening .glow-top,
+    body.listening .glow-bottom,
+    body.listening .glow-left,
+    body.listening .glow-right {
+      opacity: 1;
+      animation: glowListenPulse 1s ease-in-out infinite;
+    }
+
+    body.listening .corner {
+      opacity: 1;
+      animation: cornerListenPulse 1s ease-in-out infinite;
+    }
+
+    /* Speaking state - wave effect */
+    body.speaking .border-top,
+    body.speaking .border-bottom,
+    body.speaking .border-left,
+    body.speaking .border-right {
+      opacity: 1;
+      animation: speakPulse 0.5s ease-in-out infinite alternate;
+      background: linear-gradient(90deg,
+        transparent 0%,
+        #00ffaa 20%,
+        #00cc88 50%,
+        #00ffaa 80%,
+        transparent 100%
+      );
+    }
+
+    body.speaking .glow-top,
+    body.speaking .glow-bottom {
+      background: linear-gradient(180deg, rgba(0,255,150,0.3) 0%, transparent 100%);
+      animation: glowPulse 0.5s ease-in-out infinite alternate;
+    }
+
+    body.speaking .glow-bottom {
+      background: linear-gradient(0deg, rgba(0,255,150,0.3) 0%, transparent 100%);
+    }
+
+    body.speaking .glow-left {
+      background: linear-gradient(90deg, rgba(0,255,150,0.3) 0%, transparent 100%);
+    }
+
+    body.speaking .glow-right {
+      background: linear-gradient(270deg, rgba(0,255,150,0.3) 0%, transparent 100%);
+    }
+
+    body.speaking .glow-top,
+    body.speaking .glow-bottom,
+    body.speaking .glow-left,
+    body.speaking .glow-right {
+      opacity: 1;
+      animation: glowPulse 0.5s ease-in-out infinite alternate;
+    }
+
+    body.speaking .corner {
+      opacity: 1;
+      border-color: #00ffaa !important;
+      animation: cornerPulse 0.5s ease-in-out infinite alternate;
+    }
+
+    @keyframes borderPulse {
+      0%, 100% { opacity: 0.7; }
+      50% { opacity: 1; }
+    }
+
+    @keyframes glowPulse {
+      0%, 100% { opacity: 0.6; }
+      50% { opacity: 1; }
+    }
+
+    @keyframes cornerPulse {
+      0%, 100% { opacity: 0.8; }
+      50% { opacity: 1; }
+    }
+
+    @keyframes listenPulse {
+      0%, 100% { opacity: 0.5; }
+      50% { opacity: 1; }
+    }
+
+    @keyframes glowListenPulse {
+      0%, 100% { opacity: 0.4; }
+      50% { opacity: 1; }
+    }
+
+    @keyframes cornerListenPulse {
+      0%, 100% { opacity: 0.6; }
+      50% { opacity: 1; }
+    }
+
+    @keyframes speakPulse {
+      from { opacity: 0.8; }
+      to { opacity: 1; }
+    }
+  </style>
+</head>
+<body>
+  <!-- Border lines -->
+  <div class="border-top"></div>
+  <div class="border-bottom"></div>
+  <div class="border-left"></div>
+  <div class="border-right"></div>
+
+  <!-- Glow effects -->
+  <div class="glow-top"></div>
+  <div class="glow-bottom"></div>
+  <div class="glow-left"></div>
+  <div class="glow-right"></div>
+
+  <!-- Corner accents -->
+  <div class="corner corner-tl"></div>
+  <div class="corner corner-tr"></div>
+  <div class="corner corner-bl"></div>
+  <div class="corner corner-br"></div>
+
+  <script>
+    const { ipcRenderer } = require('electron')
+
+    ipcRenderer.on('set-mode', (event, mode) => {
+      document.body.className = mode || ''
+    })
+  </script>
+</body>
+</html>
