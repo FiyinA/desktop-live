@@ -1,7 +1,6 @@
 # Desktop Live 🎙️
 
-A Windows desktop app that lets you talk to Gemini AI with live screen sharing.
-Blue border glows around your screen when Live is active.
+A Windows desktop app that lets you talk to your computer with live screen sharing.
 
 ## Features
 - 🔵 Blue glowing border around screen when Live is on
