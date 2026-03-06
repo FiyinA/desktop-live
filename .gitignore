@@ -23,6 +23,7 @@ Thumbs.db
 # Editor
 .vscode/
 .idea/
+.claude/
 
 # Electron packager artifacts
 release/
